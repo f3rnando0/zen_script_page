@@ -131,6 +131,14 @@ export default function HomePage() {
 		}
 	};
 
+	useEffect(() => {
+		addView();
+	}, [])
+
+	const addView = async () => {
+		return await axios.get("/api/stats");
+	}
+
 	return (
 		<>
 			<PayPalScriptProvider options={initialOptions}>
@@ -197,7 +205,15 @@ export default function HomePage() {
 									</div>
 								</div>
 							</div>
-							<div className="w-full pt-4">
+							<div className="w-full py-4">
+								<button type="button" className="open bg-black w-full h-[45px] rounded-md text-white p-2 flex flex-row justify-center items-center gap-2 hover:brightness-90"><img
+									src="/btc_ltc_eth.png"
+									alt="bitcoin"
+									className="h-[35px]"
+								/>Pay with crypto</button>
+							</div>
+							<div className="w-full relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-neutral-400"><span className="relative z-10 bg-gray-800 px-2 text-white">OR</span></div>
+							<div className="w-full pt-6">
 								<PayPalButtons
 									createOrder={createOrder}
 									onApprove={onApprove}

@@ -1,5 +1,8 @@
 import axios, { isAxiosError } from "axios";
 import { base, generateAccessToken } from "../utils";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
 	const { orderID } = await req.json();
@@ -21,6 +24,24 @@ export async function POST(req: Request) {
 				},
 			});
 
+			if (response.data?.status === "COMPLETED") {
+				const order = await prisma.order.findFirst({
+					where: {
+						id: response.data.id,
+					},
+				});
+
+				if (!order) {
+					await prisma.order.create({
+						data: {
+							id: response.data.id,
+							amount: response.data.payments.captures[0].amount.value,
+							status: response.data.status,
+						},
+					});
+				}
+			}
+
 			return Response.json(response.data.status);
 		} catch (error) {
 			if (isAxiosError(error)) {
@@ -31,4 +52,6 @@ export async function POST(req: Request) {
 			return Response.error();
 		}
 	}
+
+	return Response.error();
 }
